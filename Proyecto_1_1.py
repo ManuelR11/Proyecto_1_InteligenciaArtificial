@@ -73,9 +73,9 @@ def convertir_maze_a_grafo(maze):
 
     for i in range(rows):
         for j in range(cols):
-            if maze[i][j] == 1 or maze[i][j] == 2 or maze[i][j] == 3:  # Consider only spaces with 1, 2 (start), and 3 (goal) as traversable
+            if maze[i][j] == 1 or maze[i][j] == 2 or maze[i][j] == 3:  
                 neighbors = []
-                if i > 0 and maze[i - 1][j] != 0:  # Do not consider spaces with 0 as traversable
+                if i > 0 and maze[i - 1][j] != 0:  
                     neighbors.append((i - 1, j))
                 if i < rows - 1 and maze[i + 1][j] != 0:
                     neighbors.append((i + 1, j))
@@ -93,7 +93,7 @@ def draw_maze(maze):
     screen.setup(width=600, height=600)
     screen.setworldcoordinates(0, len(maze), len(maze[0]), 0)
 
-    turtle.tracer(0, 0)  # Turn off animation
+    turtle.tracer(0, 0)
 
     for y in range(len(maze)):
         for x in range(len(maze[0])):
@@ -115,7 +115,7 @@ def draw_maze(maze):
                 turtle.right(90)
             turtle.end_fill()
 
-    turtle.update()  # Update the screen after drawing
+    turtle.update() 
     turtle.done()
 
 
@@ -124,7 +124,7 @@ def Breadth_first_search(graph, start, goal):
     frontier = QueueFIFO()
     frontier.insert(start)
     came_from = {start: None}
-    explored = set()  # Conjunto de nodos explorados
+    explored = set() 
 
     while not frontier.empty():
         iterations += 1
@@ -139,9 +139,8 @@ def Breadth_first_search(graph, start, goal):
                 frontier.insert(next_node)
                 came_from[next_node] = current
     else:
-        return [], iterations  # No se encontró el objetivo
+        return [], iterations  
 
-    # Reconstruir el camino
     path = []
     current_node = goal
     while current_node is not None:
@@ -156,7 +155,7 @@ def depth_first_search(graph, start, goal):
     frontier = StackLIFO()
     frontier.insert(start)
     came_from = {start: None}
-    explored = set()  # Conjunto de nodos explorados
+    explored = set()  
 
     while not frontier.empty():
         iterations += 1
@@ -171,9 +170,8 @@ def depth_first_search(graph, start, goal):
                 frontier.insert(next_node)
                 came_from[next_node] = current
     else:
-        return [], iterations  # No se encontró el objetivo
+        return [], iterations
 
-    # Reconstruir el camino
     path = []
     current_node = goal
     while current_node is not None:
@@ -183,11 +181,11 @@ def depth_first_search(graph, start, goal):
 
     return path, iterations
 
-# Función para verificar la existencia de un camino entre start y goal
+
 def check_path_existence(graph, start, goal):
     frontier = QueueFIFO()
     frontier.insert(start)
-    explored = set()  # Conjunto de nodos explorados
+    explored = set()  
 
     while not frontier.empty():
         current = frontier.remove_first()
@@ -216,7 +214,7 @@ def uniform_cost_search(graph, start, goal):
             break
 
         for next_node in graph[current]:
-            new_cost = cost_so_far[current] + 1  # Assuming each step costs 1
+            new_cost = cost_so_far[current] + 1  
             if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
                 cost_so_far[next_node] = new_cost
                 priority = new_cost
@@ -247,7 +245,7 @@ def a_star_search(graph, start, goal, heuristic_func):
             break
 
         for next_node in graph[current]:
-            new_cost = cost_so_far[current] + 1  # Assuming each step costs 1
+            new_cost = cost_so_far[current] + 1  
             if next_node not in cost_so_far or new_cost < cost_so_far[next_node]:
                 cost_so_far[next_node] = new_cost
                 priority = new_cost + heuristic_func(next_node, goal)
@@ -265,7 +263,7 @@ def a_star_search(graph, start, goal, heuristic_func):
 def depth_delimited_search(graph, start, goal, depth_limit):
     iterations = 0
     frontier = StackLIFO()
-    frontier.insert((start, 0))  # Tuple (node, depth)
+    frontier.insert((start, 0))  
     came_from = {start: None}
 
     while not frontier.empty():
@@ -282,7 +280,7 @@ def depth_delimited_search(graph, start, goal, depth_limit):
                     came_from[next_node] = current
 
     if goal not in came_from:
-        return [], iterations  # No path found
+        return [], iterations 
 
     path = []
     current_node = goal
@@ -320,7 +318,7 @@ def greedy_best_first_search(graph, start, goal, heuristic_func):
 
     return path, iterations
 
-# Heuristic functions
+
 def euclidean_distance(node, goal):
     x1, y1 = node
     x2, y2 = goal
@@ -334,26 +332,24 @@ def manhattan_distance(node, goal):
 def find_start(maze):
     for i in range(len(maze)):
         for j in range(len(maze[0])):
-            if maze[i][j] == 2:  # Entrada
-                return (i, j)  # Coordenadas de la entrada
-    return None  # Si no se encuentra la entrada
+            if maze[i][j] == 2:
+                return (i, j)
+    return None 
 
 def find_goal(maze):
     for i in range(len(maze)):
         for j in range(len(maze[0])):
-            if maze[i][j] == 3:  # Salida
-                return (i, j)  # Coordenadas de la salida
-    return None  # Si no se encuentra la salida en el laberinto
+            if maze[i][j] == 3: 
+                return (i, j)  
+    return None  
 
 
 
 
-
-# Función para verificar la existencia de un camino entre start y goal
 def check_path_existence(graph, start, goal):
     frontier = QueueFIFO()
     frontier.insert(start)
-    explored = set()  # Conjunto de nodos explorados
+    explored = set()  
 
     while not frontier.empty():
         current = frontier.remove_first()
@@ -372,7 +368,6 @@ def check_path_existence(graph, start, goal):
 maze_file = 'Prueba_3.txt'
 maze = load_maze(maze_file)
 
-# Encontrar start y goal después de convertir a grafo 
 maze_graph = convertir_maze_a_grafo(maze)
 
 start = list(maze_graph.keys())[0]
@@ -387,8 +382,7 @@ elif not check_path_existence(maze_graph, start, goal):
 else:
     # Dibujar el laberinto
     draw_maze(maze)
-
-    # Run algorithms on the maze
+    
     algorithms = {
         'Breadth First Search': Breadth_first_search,
         'Depth First Search': depth_first_search,
