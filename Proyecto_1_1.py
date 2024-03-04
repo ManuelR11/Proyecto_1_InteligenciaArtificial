@@ -1,18 +1,9 @@
-'''
-Manuel Rodas 21509
-Universidad del Valle 
-Inteligencia Artificial
-Laboratorio 01
-Solving Problems by Searching
-'''
-
-
 import pandas as pd
 from collections import deque, defaultdict
 import heapq
 import time
+import turtle
 
-#----------------- Implemente estructuras de colas FIFO, LIFO y PRIORITY ------------
 # Clase FIFO
 class QueueFIFO:
     def __init__(self):
@@ -67,8 +58,6 @@ class PriorityQueue:
     def insert(self, item, priority):
         heapq.heappush(self.queue, (priority, item))
         return self.queue
-
-
 # ----------------- Implementacion de algoritmos ----------------
 def load_maze(file_path):
     maze = []
@@ -99,6 +88,35 @@ def convertir_maze_a_grafo(maze):
 
     return graph
 
+def draw_maze(maze):
+    screen = turtle.Screen()
+    screen.setup(width=600, height=600)
+    screen.setworldcoordinates(0, len(maze), len(maze[0]), 0)
+
+    turtle.tracer(0, 0)  # Turn off animation
+
+    for y in range(len(maze)):
+        for x in range(len(maze[0])):
+            if maze[y][x] == 1:
+                turtle.fillcolor("black")
+            elif maze[y][x] == 0:
+                turtle.fillcolor("white")
+            elif maze[y][x] == 2:
+                turtle.fillcolor("green")
+            elif maze[y][x] == 3:
+                turtle.fillcolor("red")
+
+            turtle.penup()
+            turtle.goto(x, len(maze) - y - 1)
+            turtle.pendown()
+            turtle.begin_fill()
+            for _ in range(4):
+                turtle.forward(1)
+                turtle.right(90)
+            turtle.end_fill()
+
+    turtle.update()  # Update the screen after drawing
+    turtle.done()
 
 
 def Breadth_first_search(graph, start, goal):
@@ -275,6 +293,32 @@ def depth_delimited_search(graph, start, goal, depth_limit):
 
     return path, iterations
 
+def greedy_best_first_search(graph, start, goal, heuristic_func):
+    iterations = 0
+    frontier = PriorityQueue()
+    frontier.insert(start, 0)
+    came_from = {start: None}
+
+    while not frontier.empty():
+        iterations += 1
+        current = frontier.remove_first()[1]
+
+        if current == goal:
+            break
+
+        for next_node in graph[current]:
+            if next_node not in came_from:
+                priority = heuristic_func(next_node, goal)
+                frontier.insert(next_node, priority)
+                came_from[next_node] = current
+    path = []
+    current_node = goal
+    while current_node is not None:
+        path.append(current_node)
+        current_node = came_from[current_node]
+    path.reverse()
+
+    return path, iterations
 
 # Heuristic functions
 def euclidean_distance(node, goal):
@@ -302,7 +346,30 @@ def find_goal(maze):
     return None  # Si no se encuentra la salida en el laberinto
 
 
-maze_file = 'laberinto.txt'
+
+
+
+# Función para verificar la existencia de un camino entre start y goal
+def check_path_existence(graph, start, goal):
+    frontier = QueueFIFO()
+    frontier.insert(start)
+    explored = set()  # Conjunto de nodos explorados
+
+    while not frontier.empty():
+        current = frontier.remove_first()
+        explored.add(current)
+
+        if current == goal:
+            return True
+
+        for next_node in graph[current]:
+            if next_node not in explored:
+                frontier.insert(next_node)
+    return False
+
+
+
+maze_file = 'Prueba_3.txt'
 maze = load_maze(maze_file)
 
 # Encontrar start y goal después de convertir a grafo 
@@ -318,12 +385,15 @@ elif goal is None:
 elif not check_path_existence(maze_graph, start, goal):
     print("No hay un camino posible entre el punto de inicio y el punto de salida.")
 else:
+    # Dibujar el laberinto
+    draw_maze(maze)
+
     # Run algorithms on the maze
     algorithms = {
         'Breadth First Search': Breadth_first_search,
         'Depth First Search': depth_first_search,
-        'Depth-delimited Search (Depth Limit = 10)': lambda graph, start, goal: depth_delimited_search(graph, start, goal, 10),
-        'Uniform Cost Search': uniform_cost_search,
+        'greedy Best First Search (Euclidean Distance Heuristic)': lambda graph, start, goal: greedy_best_first_search(graph, start, goal, euclidean_distance),
+        'Depth-delimited Search (Depth Limit = 10)': lambda graph, start, goal: depth_delimited_search(graph, start, goal, 500),
         'A* Search (Euclidean Distance Heuristic)': lambda graph, start, goal: a_star_search(graph, start, goal, euclidean_distance),
         'A* Search (Manhattan Distance Heuristic)': lambda graph, start, goal: a_star_search(graph, start, goal, manhattan_distance)
     }
@@ -334,7 +404,6 @@ else:
         path, iterations = algorithm(maze_graph, start, goal)
         end_time = time.time()
         print(f'Path found: {path}')
-        print(f'Iterations used: {iterations}')
+        print(f'Steps:', len(path))
+        print(f'Iterations:', iterations)
         print(f'Time: {end_time - start_time} s')
-
-
